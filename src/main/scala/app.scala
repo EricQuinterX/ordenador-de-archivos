@@ -1,7 +1,6 @@
 package app_procesador
 
 import com.typesafe.config.ConfigFactory
-import scala.collection.JavaConversions._
 import scala.swing._
 import scala.swing.event._
 import Swing.{HStrut, VStrut, EmptyBorder}
@@ -19,9 +18,33 @@ object app {
   }
 }
 
+case class ConfigFile() {
+	def getVersion : String = {
+		Try(ConfigFactory.load("application.config").getString("foldername")) match {
+			case Success(s) => s
+			case Failure(_) => throw new ErrorCargarConfig("Hubo error al cargar la version de la configuracion")
+		}
+	}
+	def getFoldername : String = {
+		val name_folder = Try(ConfigFactory.load("application.config").getString("foldername")) 
+		name_folder match {
+			case Success(s) = s
+			case Failure(_) = throw new ErrorCargarConfig("Error cargar nombre de la carpeta del config")
+		}
+	}
+	def getExecOrderList : List[String] = {
+		import scala.collection.JavaConversions._
+		val lista_orden = Try (ConfigFactory.load("application.config").getStringList("execOrder").toList)
+		lista_orden match {
+			case Success(xs) = xs
+			case Failure(_) = throw new ErrorCargarConfig("Error cargar orden de ejecucion del config")	
+		}
+	}
+}
+
 class UI extends MainFrame {
 
-	val version = "1.0"
+	val version : String = ConfigFile.getVersion
 	// Componentes
 	val ui = this
 	val lbPath = new Label("Ruta:")
@@ -81,34 +104,41 @@ class UI extends MainFrame {
   }
 }
 
+case class ErrorCargarConfig(msg: String, cause: Throwable = null) extends Exception(msg, cause)
+
 case class FileKeyword (word: String, folder: String)
 
 case class Core (gui: UI) {
 
-	val folderResult : String = "ARCHIVOS_BBDD"
-	var filesystem : FileSystemFilter = _
+	var filesystem 	 : FileSystemFilter = _
+
+	/*
 	val priority: Map[Int, FileKeyword] = Map (
 		0 -> FileKeyword(".Deletes.","OLD"),
-		1 -> FileKeyword("CREATE_TABLE","NEW"),
-		2 -> FileKeyword("CREATE_INDEX","NEW"),
-		3 -> FileKeyword("ALTER_TABLE","NEW"),
-		4 -> FileKeyword("ALTER_INDEX","NEW"),
-		5 -> FileKeyword(".Deletes.","NEW"),
-		6 -> FileKeyword(".Inserts.","NEW"),
+		1 -> FileKeyword(".Deletes.","NEW"),
+		2 -> FileKeyword(".Inserts.","NEW"),
+		3 -> FileKeyword("CREATE_TABLE","NEW"),
+		4 -> FileKeyword("CREATE_INDEX","NEW"),
+		5 -> FileKeyword("ALTER_TABLE","NEW"),
+		6 -> FileKeyword("ALTER_INDEX","NEW"),
 		7 -> FileKeyword("FUNCITON","NEW"),
 		8 -> FileKeyword("PROCEDURE","NEW"),
 		9 -> FileKeyword("PACKAGE","NEW")
-	)
+	)*/
 
-	def procesar = {
+	def procesar() = {
 		Try {
 			// cada vez que haga clic en el boton se debe limpiar el Detalle
+			folderResult = getFoldername()
+			execOrderList = getExecOrderList()
 			gui.txtAreaOutput.text = ""
 			blockComponents()
 			val new_files = getListOfFiles(path + "\\NEW")
 			val old_files = getListOfFiles(path + "\\OLD")
-			val all_files = (new_files ::: old_files).sorted
+			val all_files = (old_files ::: new_files).sorted
 			var i = 0
+			val configPriority = ConfigFile.getExecOrderList
+			
 			filesystem = FileSystemFilter(all_files, gui.txtAreaOutput)
 
 			for (i <- 0 until priority.size)
@@ -117,12 +147,9 @@ case class Core (gui: UI) {
 			gui.txtAreaOutput.append(s"${filesystem.index.toString} fueron acomodados y enumerados \n")
 		} getOrElse {
 			gui.txtAreaOutput.append("Hubo un Error" )
+			unBlockComponents()
 		}
 	}
-
-	private def getFoldername : Try[String] = Try (ConfigFactory.load("application.config").getString("foldername"))
-
-	private def getListExecOrder : Try[List[String]] = Try (ConfigFactory.load("application.config").getStringList("execOrder").toList)
 
 	private def path : String = gui.txtInputPath.text
 
@@ -161,6 +188,7 @@ case class Core (gui: UI) {
       List[File]()
 	}
 }
+
 
 case class FileSystemFilter(remainingFiles: List[File], 
 														componente: TextArea, 
