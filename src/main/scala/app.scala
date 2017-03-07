@@ -40,7 +40,15 @@ class UI extends MainFrame {
 		reactions += {
 			case ButtonClicked(_) => txtInputPath.text match {
 				case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="You pressed me")
-				case _ => Core(ui).procesar
+				case _ =>
+					val actions = List(chkOrdenar, chkCodificar)
+					var i : Int = 0
+					for (i <- 0 until actions.size){
+						i match {
+							case 0 => if (actions(i).selected) Core(ui).ordenar
+							case 1 => if (actions(i).selected) Core(ui).encodeAnsi
+						}
+					}
 			}
 		}
 	}
@@ -121,7 +129,8 @@ case class Core (gui: UI) {
 	var filesystem  : FileSystemFilter = _
 	var folderResult: String = _
 
-	def procesar() = {
+
+	def ordenar() = {
 		val resultado = Try {
 			// cada vez que haga clic en el boton se debe limpiar el Detalle
 			folderResult = ConfigFile.getFoldername
@@ -146,6 +155,10 @@ case class Core (gui: UI) {
 				gui.txtAreaOutput.append("Hubo un Error al procesar el pasaje" )
 				unBlockComponents()
 		}
+	}
+
+	def encodeAnsi() {
+		Dialog.showMessage(null,	"Aun no se desarrollo la funcionalidad de codificar a Ansi", title="Ansi")
 	}
 
 	private def getListOfFiles(dir: String): List[File] = {
@@ -188,8 +201,8 @@ case class Core (gui: UI) {
 
 
 case class FileSystemFilter(remainingFiles: List[File], 
-							index: Int = 0, 
-							filemap: List[(File, String)] = Nil) {
+														index: Int = 0, 
+														filemap: List[(File, String)] = Nil) {
 
 	def start (word: String, foldername: String): FileSystemFilter = {
 		var lista: List[(File, String)] = Nil
