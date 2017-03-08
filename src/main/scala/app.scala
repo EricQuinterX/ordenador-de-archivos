@@ -135,6 +135,9 @@ case class Core (gui: UI) {
 
 			for (i <- 0 until configPriority.size)
 				filesystem = filesystem.start( configPriority(i).keyword, configPriority(i).folder )
+			// proceso el resto
+			filesystem = filesystem.start(".Sql", "NEW")
+
 			createAndCopyFiles()
 			gui.txtAreaOutput.append(s"${filesystem.index.toString} fueron acomodados y enumerados \n")
 		}
@@ -196,21 +199,24 @@ case class FileSystemFilter(remainingFiles: List[File],
 	def start (word: String, foldername: String): FileSystemFilter = {
 		var lista: List[(File, String)] = Nil
 		var	i = index
+		def criteria(x: File) = x.getParentFile.getName == foldername && x.getName.contains(word)
 		for {
-			file <- remainingFiles.filter( _.getParentFile.getName == foldername )
-			if file.getName.contains(word)
+			file <- remainingFiles.filter( criteria(_))
 		} yield {
 			val p = genNewNameFile(i, foldername, file.getName )
 			lista = lista :+ ((file, p ))
 			i += 1
 		}
-		var resto = remainingFiles.filter( e => !e.getName.contains(word) || !(e.getParent == foldername) )
-		copy(index = i, filemap = filemap ::: lista, remainingFiles = resto)
+		val procesados = remainingFiles.filter(criteria(_))
+		println(s"Procesados con '$word': ${procesados.size}")
+		var paraProcesar = remainingFiles filterNot procesados.contains
+		println(s"Restantes para procesar: ${paraProcesar.size}")
+		copy(index = i, filemap = filemap ::: lista, remainingFiles = paraProcesar)
 	}
 
 	private def genNewNameFile(i: Int, prefix: String, filename: String) = prefix match {
 		case "OLD" => genStringIndex(i) + "_" + prefix + "_" + filename
-		case "NEW" => genStringIndex(i) + "_" + filename
+		case "NEW" => genStringIndex(i) + "_" + filename // a los archivos del /NEW no muestro este prefijo
 	}
 
 	private def genStringIndex(i: Int) = String.valueOf(i).length() match {

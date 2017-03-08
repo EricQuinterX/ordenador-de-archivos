@@ -59,6 +59,10 @@ type NUL > NEW\PACKAGE_PA_T_50.Sql
 type NUL > NEW\PACKAGE_PA_INFO_CLI.Sql
 type NUL > NEW\PACKAGE_PKG_T_9.Sql
 type NUL > NEW\PACKAGE_PA_GLOBAL_G36.Sql
+type NUL > NEW\INS_DATOS_ENT_TR_98.Sql
+type NUL > NEW\UPD_IBS_CAT_DATA.Sql
+type NUL > NEW\CREO_SUPER_VISTA.Sql
+
 echo "NEW files created"
 
 pause
