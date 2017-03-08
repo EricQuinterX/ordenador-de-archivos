@@ -41,14 +41,9 @@ class UI extends MainFrame {
 			case ButtonClicked(_) => txtInputPath.text match {
 				case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="You pressed me")
 				case _ =>
-					val actions = List(chkOrdenar, chkCodificar)
-					var i : Int = 0
-					for (i <- 0 until actions.size){
-						i match {
-							case 0 => if (actions(i).selected) Core(ui).ordenar
-							case 1 => if (actions(i).selected) Core(ui).encodeAnsi
-						}
-					}
+					if (chkOrdenar.selected) Core(ui).ordenar
+					if (chkCodificar.selected) Core(ui).encodeAnsi
+					if (!chkOrdenar.selected && !chkCodificar.selected) Dialog.showMessage(null, "Elija una funcion", title="Advertencia")
 			}
 		}
 	}
@@ -91,32 +86,28 @@ class UI extends MainFrame {
 case class ErrorCargarConfig(msg: String, cause: Throwable = null) extends Exception(msg, cause)
 
 case class FileKeyword (params: Config) {
-	val keyword: String = params.getString("keyword")
-	val folder : String = params.getString("folder")
+	val keyword: String = Try (params.getString("keyword")).getOrElse("")
+	val folder : String = Try (params.getString("folder")).getOrElse("NEW")
 }
 
 object ConfigFile {
+
 	val configFile = ConfigFactory.parseFile(new File("application.conf")).getConfig("app")
 	val config = ConfigFactory.load(configFile)
-	def getVersion : String = {
-		Try(config.getString("version")) match {
-			case Success(s) => s
-			case Failure(_) => throw new ErrorCargarConfig("Hubo error al cargar la version de la configuracion")
-		}
+
+	def getVersion : String = Try(config.getString("version")) match {
+		case Success(s) => s
+		case Failure(_) => throw new ErrorCargarConfig("Hubo error al cargar la version de la configuracion")
 	}
-	def getFoldername : String = {
-		val name_folder = Try(config.getString("folder")) 
-		name_folder match {
-			case Success(s) => s
-			case Failure(_) => throw new ErrorCargarConfig("Error cargar nombre de la carpeta del config")
-		}
+
+	def getFoldername : String = Try(config.getString("folder")) match {
+		case Success(s) => s
+		case Failure(_) => throw new ErrorCargarConfig("Error cargar nombre de la carpeta del config")
 	}
+
 	def getExecOrderList : List[FileKeyword] = {
 		import scala.collection.JavaConversions._
-		val lista_orden = Try {
-			val lista = config.getConfigList("priority")
-			(lista.map(FileKeyword(_))).toList
-		}
+		val lista_orden = Try ( config.getConfigList("priority").map(FileKeyword(_)).toList )
 		lista_orden match {
 			case Success(xs) => xs
 			case Failure(_) => throw new ErrorCargarConfig("Error cargar orden de ejecucion del config")	
@@ -129,10 +120,8 @@ case class Core (gui: UI) {
 	var filesystem  : FileSystemFilter = _
 	var folderResult: String = _
 
-
 	def ordenar() = {
 		val resultado = Try {
-			// cada vez que haga clic en el boton se debe limpiar el Detalle
 			folderResult = ConfigFile.getFoldername
 			gui.txtAreaOutput.text = ""
 			blockComponents()
@@ -140,7 +129,7 @@ case class Core (gui: UI) {
 			val old_files = getListOfFiles(path + "\\OLD")
 			val all_files = (old_files ::: new_files).sorted
 			var i = 0
-			val configPriority = ConfigFile.getExecOrderList
+			val configPriority = ConfigFile.getExecOrderList// :: FileKeyword(new Config)
 			
 			filesystem = FileSystemFilter(all_files)
 
