@@ -48,7 +48,17 @@ class UI extends MainFrame {
 		}
 	}
 	val btnHelp = new Button("Ayuda")
-	val btnConfig = new Button("Config")
+	val btnConfig = new Button("Config") {
+		listenTo(this)
+		reactions += {
+			case ButtonClicked(_) => 
+				import sys.process._
+				val cmd = "RUNDLL32.EXE SHELL32.DLL,OpenAs_RunDLL " + new File("application.conf").getName
+				cmd.!
+		}
+
+		
+	}
 	
 	// Propiedades
   title = s"Procesador de Pasajes Engage v$version"
@@ -83,7 +93,19 @@ class UI extends MainFrame {
   }
 }
 
+
+//EXCEPCIONES QUE PUEDEN EXISTIR
+case class ErrorGetFolderName(msg: String) extends Exception(msg)
+case class ErrorGetPriorityList(msg: String) extends Exception(msg)
+case class ErrorGetVersionApp(msg: String) extends Exception(msg)
+
+
 case class ErrorCargarConfig(msg: String, cause: Throwable = null) extends Exception(msg, cause)
+
+
+
+
+
 
 case class FileKeyword (params: Config) {
 	val keyword: String = Try (params.getString("keyword")).getOrElse("")
@@ -117,7 +139,7 @@ object ConfigFile {
 
 case class Core (gui: UI) {
 
-	var filesystem  : FileSystemFilter = _
+	var fileSystem  : FileSystemFilter = _
 	var folderResult: String = _
 
 	def ordenar() = {
@@ -128,18 +150,23 @@ case class Core (gui: UI) {
 			val new_files = getListOfFiles(path + "\\NEW")
 			val old_files = getListOfFiles(path + "\\OLD")
 			val all_files = (old_files ::: new_files).sorted
-			var i = 0
-			val configPriority = ConfigFile.getExecOrderList// :: FileKeyword(new Config)
-			
-			filesystem = FileSystemFilter(all_files)
+			var i = 0 
+			val configPriority : List[FileKeyword] = ConfigFile.getExecOrderList// :: FileKeyword(new Config)
+			val PRIORITY_SIZE = configPriority.size
+//			var tupla : Tuple2[String, String] = _
+			fileSystem = FileSystemFilter(all_files)
 
-			for (i <- 0 until configPriority.size)
-				filesystem = filesystem.start( configPriority(i).keyword, configPriority(i).folder )
-			// proceso el resto
-			filesystem = filesystem.start(".Sql", "NEW")
-
+			for (i <- 0 until PRIORITY_SIZE) {
+				val filtro = configPriority(i)
+				val tupla = i match { 
+					// si termino de recorrer la lista, ejecuto el mismo proceso para los demas archivos de la carpeta NEW
+					case PRIORITY_SIZE => (".", "NEW") 
+					case _ => (filtro.keyword, filtro.folder)
+				}
+				fileSystem = fileSystem.start ( tupla._1 , tupla._2 )
+			}
 			createAndCopyFiles()
-			gui.txtAreaOutput.append(s"${filesystem.index.toString} fueron acomodados y enumerados \n")
+			gui.txtAreaOutput.append(s"${fileSystem.index} archivos fueron ordenados \n")
 		}
 		resultado match {
 			case Success(_) => unBlockComponents()
@@ -180,7 +207,7 @@ case class Core (gui: UI) {
 		val cmd_mkdir = "cmd /C \"cd " + resolvePath(path) + " && mkdir " + folderResult + "\""
 		cmd_mkdir.!
 		for {
-			(file, newNameFile) <- filesystem.filemap
+			(file, newNameFile) <- fileSystem.filemap
 		} yield {
 			var cmd_copy = "cmd /C copy \"" + resolvePath(file.getPath) + "\" \"" + resolvePath(path) + "\\\\" + folderResult + "\\\\" + newNameFile + "\""
 			cmd_copy.!
@@ -208,9 +235,9 @@ case class FileSystemFilter(remainingFiles: List[File],
 			i += 1
 		}
 		val procesados = remainingFiles.filter(criteria(_))
-		println(s"Procesados con '$word': ${procesados.size}")
+		//println(s"Procesados con '$word': ${procesados.size}")
 		var paraProcesar = remainingFiles filterNot procesados.contains
-		println(s"Restantes para procesar: ${paraProcesar.size}")
+		//println(s"Restantes para procesar: ${paraProcesar.size}")
 		copy(index = i, filemap = filemap ::: lista, remainingFiles = paraProcesar)
 	}
 
