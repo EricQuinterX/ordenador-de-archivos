@@ -5,12 +5,17 @@
 .cache
 .history
 .lib/
-dist/*
+dist/
 target/
 lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+
+# Pruebas del App
+test/ARCHIVOS_ORGANIZADOS/
+test/ARCHIVOS_CODIFICADOS/
+test/ARCHIVOS_SECUENCIADOS/
 NEW/
 OLD/
 

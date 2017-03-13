@@ -25,39 +25,46 @@ class UI extends MainFrame {
 	// Componentes
 	val lbPath = new Label("Ruta:")
 	val txtInputPath = new TextField(45)
-	val chkOrganizar = new CheckBox("Ordenar pasaje")
-	val chkCodificar = new CheckBox("Codificar en ANSI")
+	val chkOrganizar = new CheckBox("Organizar *")
+  val chkSecuenciar = new CheckBox("Secuenciar *")
+  val chkCodificar = new CheckBox("Codificar solo en Ansi")
 	val txtAreaOutput = new TextArea(10,55){
 		editable = false
 		font = new Font("Console",Font.PLAIN,10)
-	}	
+	}
 	val scrollTxtArea = new ScrollPane(txtAreaOutput){
 		verticalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
 		border = BorderFactory.createTitledBorder("Detalles")
 	}
-	val btnProcesar = new Button("Aplicar"){
-		listenTo(this)
-		reactions += {
-			case ButtonClicked(_) => txtInputPath.text match {
-				case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="You pressed me")
-				case _ =>
-					if (chkOrganizar.selected) Core(ui).organizar
-					if (chkCodificar.selected) Core(ui).encodeAnsi
-					if (!chkOrganizar.selected && !chkCodificar.selected) Dialog.showMessage(null, "Elija una funcion", title="Advertencia")
-			}
-		}
-	}
+	val btnProcesar = new Button("Aplicar")
 	val btnHelp = new Button("Ayuda")
 	val btnConfig = new Button("Config") {
 		listenTo(this)
 		reactions += {
-			case ButtonClicked(_) => 
+			case ButtonClicked(_) =>
 				import sys.process._
 				val cmd = "RUNDLL32.EXE SHELL32.DLL,OpenAs_RunDLL " + new File("application.conf").getName
 				cmd.!
-		}		
+		}
 	}
-	
+
+  listenTo(chkOrganizar, chkSecuenciar, chkCodificar, btnProcesar)
+  reactions += {
+    case ButtonClicked(`chkOrganizar`) => chkCodificar.selected = false
+    case ButtonClicked(`chkSecuenciar`) => chkCodificar.selected = false
+    case ButtonClicked(`chkCodificar`) =>
+      chkOrganizar.selected = false
+      chkSecuenciar.selected = false
+    case ButtonClicked(`btnProcesar`) => txtInputPath.text match {
+      case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="You pressed me")
+      case _ =>
+        if (chkOrganizar.selected || chkCodificar.selected || chkSecuenciar.selected)
+          Core(ui).start
+        else
+          Dialog.showMessage(null, "Elija una funcion", title="Advertencia")
+    }
+  }
+
 	// Propiedades
   title = s"Procesador de Pasajes Engage v$version"
   resizable = false
@@ -71,22 +78,23 @@ class UI extends MainFrame {
 			contents += txtInputPath
 		}
 		contents += new FlowPanel(FlowPanel.Alignment.Left)(){
-			border = BorderFactory.createTitledBorder("Funciones")
-			contents += chkOrganizar
-			contents += HStrut(5)
-			contents += chkCodificar
-		}
-		contents += new FlowPanel(FlowPanel.Alignment.Left)(){
-			contents += scrollTxtArea
-			contents += HStrut(5)
-			contents += new BoxPanel(Orientation.Vertical){
+			border = BorderFactory.createTitledBorder("Funciones ( * : salida en Ansi )")
+      contents += new BoxPanel(Orientation.Vertical){
+  			contents += chkOrganizar
+  			contents += VStrut(5)
+        contents += chkSecuenciar
+        contents += VStrut(5)
+        contents += chkCodificar
+      }
+      contents += new BoxPanel(Orientation.Horizontal){
 				contents += btnProcesar
-				contents += VStrut(5)
+				contents += HStrut(5)
 				contents += btnConfig
-				contents += VStrut(5)
+				contents += HStrut(5)
 				contents += btnHelp
 			}
 		}
+		contents += scrollTxtArea
 		border = EmptyBorder(10, 10, 10, 10)
   }
 }
