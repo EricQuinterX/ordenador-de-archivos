@@ -24,6 +24,7 @@ class UI extends MainFrame {
 	val ui = this
 	// Componentes
 	val lbPath = new Label("Ruta:")
+  val lbNote = new Label("*: salida en ansi")
 	val txtInputPath = new TextField(45)
 	val chkOrganizar = new CheckBox("Organizar *")
   val chkSecuenciar = new CheckBox("Secuenciar *")
@@ -78,21 +79,29 @@ class UI extends MainFrame {
 			contents += txtInputPath
 		}
 		contents += new FlowPanel(FlowPanel.Alignment.Left)(){
-			border = BorderFactory.createTitledBorder("Funciones ( * : salida en Ansi )")
       contents += new BoxPanel(Orientation.Vertical){
+        border = BorderFactory.createTitledBorder("Funciones")
   			contents += chkOrganizar
-  			contents += VStrut(5)
+  			contents += VStrut(3)
         contents += chkSecuenciar
-        contents += VStrut(5)
+        contents += VStrut(3)
         contents += chkCodificar
       }
-      contents += new BoxPanel(Orientation.Horizontal){
-				contents += btnProcesar
-				contents += HStrut(5)
-				contents += btnConfig
-				contents += HStrut(5)
-				contents += btnHelp
-			}
+      contents += new BoxPanel(Orientation.Vertical){
+        contents += new BoxPanel(Orientation.Horizontal){
+          contents += HStrut(10)
+          contents += btnProcesar
+          contents += HStrut(20)
+          contents += btnConfig
+          contents += HStrut(5)
+          contents += btnHelp
+        }
+        contents += VStrut(5)
+        contents += new FlowPanel(FlowPanel.Alignment.Left)(){
+          contents += HStrut(10)
+          contents += lbNote
+        }
+      }
 		}
 		contents += scrollTxtArea
 		border = EmptyBorder(10, 10, 10, 10)

@@ -24,7 +24,7 @@ class Organizador ( flags : Funciones, ruta : String, out : TextArea) extends Mo
   val carpeta_destino : String = Try(ConfigFile.getFolder(Organizador)).getOrElse(throw new ErrorGetFolderName("No se recupero el nombre de la carpeta desde el application.config"))
 
   def startFunction = {
-    val configPriority = Try(ConfigFile.getPriorityList).getOrElse(throw new ErrorGetPriorityList("No se recupero la lista "))
+    val configPriority : List[FileKeyword] = Try(ConfigFile.getPriorityList).getOrElse(throw new ErrorGetPriorityList("No se recupero la lista "))
     val PRIORITY_SIZE = configPriority.size
     var i : Int = 0
     restantes = (getListOfFiles(ruta +"\\OLD") ::: getListOfFiles(ruta +"\\NEW")).sorted
@@ -41,7 +41,7 @@ class Organizador ( flags : Funciones, ruta : String, out : TextArea) extends Mo
 	private def filtrar (word: String, folder: String): Unit = {
 		def criteria(x: File) = x.getParentFile.getName == folder && x.getName.contains(word)
     val filtrados = restantes.filter(criteria(_)).map{ file =>
-			ordenados = ordenados :+ ((file, getNewName(index, folder, file.getName )))
+			ordenados = ordenados.::((file, getNewName(index, folder, file.getName )))
 			index += 1
       file
     }
@@ -51,12 +51,12 @@ class Organizador ( flags : Funciones, ruta : String, out : TextArea) extends Mo
   private def createFiles = {
     var newFilesList : List[File] = Nil
     flags match {
-      case Funciones(_, true, _) => new Secuenciador(flags, destino_organizador, out)
+      case Funciones(_, true, _) => new Secuenciador(flags, carpeta_destino, out)
       case _ =>
         if (new File(carpeta_destino).mkdir.unary_!) throw new ErrorCreateFolder("No se creo la carpeta del organizador")
         for ((src, name) <- ordenados){
           val destin = new File(s"ruta\\$carpeta_destino\\$name")
-          newFilesList = newFilesList :: destin
+          newFilesList = newFilesList.::(destin)
           new FileOutputStream(destin).getChannel.transferFrom(new FileInputStream(src).getChannel, 0, Long.MaxValue)
           out.append(s"Archivo creado: $name")
         }
