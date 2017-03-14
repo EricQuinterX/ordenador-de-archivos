@@ -17,7 +17,7 @@ case class ErrorCreateFolder(msg: String) extends Exception(msg)
 case class ErrorCopyFiles(msg: String) extends Exception(msg)
 case class ErrorCargarConfig(msg: String) extends Exception(msg)
 
-case class Core (gui: UI) {
+class Core (gui: UI) {
 
 	val flags = Funciones(gui.chkOrganizar.selected, gui.chkSecuenciar.selected, gui.chkCodificar.selected)
 
@@ -50,6 +50,7 @@ case class Core (gui: UI) {
 		gui.chkOrganizar.enabled = false
 		gui.chkSecuenciar.enabled = false
 		gui.chkCodificar.enabled = false
+		gui.txtAreaOutput.text = ""
 	}
 
 	private def unBlockComponents(): Unit = {

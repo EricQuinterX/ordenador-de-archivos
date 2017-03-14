@@ -18,6 +18,7 @@ test/ARCHIVOS_CODIFICADOS/
 test/ARCHIVOS_SECUENCIADOS/
 NEW/
 OLD/
+*.jar
 
 # Scala-IDE specific
 .scala_dependencies

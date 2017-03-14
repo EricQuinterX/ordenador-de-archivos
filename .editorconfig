@@ -1,0 +1,9 @@
+root = true
+
+# Matches multiple files with brace expansion notation
+# Set default charset
+[*.scala]
+charset = utf-8
+indent_style = tab
+indent_size = 2
+trim_trailing_whitespace = true

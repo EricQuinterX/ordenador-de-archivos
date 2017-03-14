@@ -23,11 +23,7 @@ object ConfigFile {
 
 	def getPriorityList : List[FileKeyword] = {
 		import scala.collection.JavaConversions._
-		val lista_orden = Try ( config.getConfigList("priority").map(FileKeyword(_)).toList )
-		lista_orden match {
-			case Success(xs) => xs
-			case Failure(_) => throw new ErrorCargarConfig("Error cargar orden de ejecucion del config")
-		}
+		Try(config.getConfigList("priority").map(FileKeyword(_)).toList).getOrElse(throw new ErrorCargarConfig("Error cargar orden de ejecucion del config"))
 	}
 }
 
@@ -37,6 +33,6 @@ case object Secuenciador extends Sistema
 case object Codificador extends Sistema
 
 case class FileKeyword (params: Config) {
-	val keyword: String = Try (params.getString("keyword")).getOrElse("")
+	val keyword: String = Try (params.getString("keyword")).getOrElse(".")
 	val folder : String = Try (params.getString("folder")).getOrElse("NEW")
 }

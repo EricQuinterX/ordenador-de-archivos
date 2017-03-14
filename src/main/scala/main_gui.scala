@@ -39,15 +39,7 @@ class UI extends MainFrame {
 	}
 	val btnProcesar = new Button("Aplicar")
 	val btnHelp = new Button("Ayuda")
-	val btnConfig = new Button("Config") {
-		listenTo(this)
-		reactions += {
-			case ButtonClicked(_) =>
-				import sys.process._
-				val cmd = "RUNDLL32.EXE SHELL32.DLL,OpenAs_RunDLL " + new File("application.conf").getName
-				cmd.!
-		}
-	}
+	val btnConfig = new Button("Config")
 
   listenTo(chkOrganizar, chkSecuenciar, chkCodificar, btnProcesar)
   reactions += {
@@ -60,10 +52,14 @@ class UI extends MainFrame {
       case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="You pressed me")
       case _ =>
         if (chkOrganizar.selected || chkCodificar.selected || chkSecuenciar.selected)
-          Core(ui).start
+          new Core(ui).start
         else
           Dialog.showMessage(null, "Elija una funcion", title="Advertencia")
     }
+    // case ButtonClicked(`btnConfig`) =>
+    //   import sys.process._
+    //   val cmd = "RUNDLL32.EXE SHELL32.DLL,OpenAs_RunDLL " + new File("application.conf").getName
+    //   cmd.!
   }
 
 	// Propiedades
