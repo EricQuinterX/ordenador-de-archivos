@@ -25,9 +25,9 @@ class Core (gui: UI) {
 		try {
 			blockComponents
 			val nodo : Modulo = flags match {
-				case Funciones(true, _, _) => new Organizador(flags, path, gui.txtAreaOutput)
-				case Funciones(false, true, _) => new Secuenciador(flags, path, gui.txtAreaOutput)
-				case Funciones(false, false, true) => new Codificador(flags, path, gui.txtAreaOutput)
+				case Funciones(true, _, _) => new Organizador(path, gui.txtAreaOutput, Some(flags))
+				case Funciones(false, true, _) => new Secuenciador(path, gui.txtAreaOutput)
+				case Funciones(false, false, true) => new Codificador(path, gui.txtAreaOutput)
 			}
 			nodo.startFunction
 		} catch {
