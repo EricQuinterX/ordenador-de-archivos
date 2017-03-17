@@ -1,12 +1,12 @@
 # ordenador-de-pasajes-Engage
 Su utilidad seria clasificar, ordenar y renombrar archivos.
 #
-### Requisitos
+## Requisitos
 * Windows 7+
 * Java version 1.8
 * SBT 0.13.13
 #
-### Generar Ejecutable
+## Generar Ejecutable
 ###### 1. Abrir la consola de windows dentro del proyecto clonado y ejecutar:
 #
 ```
@@ -19,9 +19,9 @@ Su utilidad seria clasificar, ordenar y renombrar archivos.
 ###### 4. Los 2 archivos copiados, pegarlos en otro lugar deseado.
 #
 #
-### Utilizacion
-1.
-2.
+## Utilizacion
+1. Ejecutar el aplicativo `.jar`
+2. Especificar la ruta de las carpetas **NEW** y **OLD**. Aquellas deben contener los script `*.sql`. 
 3.
 4.
 5.
