@@ -19,7 +19,6 @@ object ConfigFile {
 		case Failure(e) => throw new ErrorCargarConfiguracion("Error al cargar el parseo de la configuracion\n" + e.getMessage)
 	}
 
-
 	def getFolder(m : Sistema) : String = {
 		val destino = m match {
 			case Organizacion => Try(config.getString("destino_organizador"))

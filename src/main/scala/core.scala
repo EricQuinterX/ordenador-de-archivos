@@ -21,7 +21,7 @@ case class ErrorCargarConfiguracion(msg: String) extends Exception(msg)
 class Core (gui: UI) {
 
 	// val flags = Funciones(gui.chkOrganizar.selected, gui.chkSecuenciar.selected, gui.chkCodificar.selected)
-	val flags = Funciones(true, false, false)
+	// val flags = Funciones(true, false, false)
 
 	def start = {
 		try {
@@ -47,20 +47,12 @@ class Core (gui: UI) {
 
 	private def setGuiLog (s: String) : Unit = gui.txtAreaOutput.append(s +"\n")
 
-	// private def resolvePath(path: String): String = path.replaceAllLiterally("\\","\\\\")
-
 	private def blockComponents(): Unit = {
 		gui.btnProcesar.enabled = false
-		// gui.chkOrganizar.enabled = false
-		// gui.chkSecuenciar.enabled = false
-		// gui.chkCodificar.enabled = false
 		gui.txtAreaOutput.text = ""
 	}
 
 	private def unBlockComponents(): Unit = {
 		gui.btnProcesar.enabled = true
-		// gui.chkOrganizar.enabled = true
-		// gui.chkSecuenciar.enabled = true
-		// gui.chkCodificar.enabled = true
 	}
 }

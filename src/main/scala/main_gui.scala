@@ -5,13 +5,12 @@ import core_app._
 import scala.swing._
 import scala.swing.event._
 import Swing.{HStrut, VStrut, EmptyBorder}
-import javax.swing.BorderFactory
+import javax.swing.{BorderFactory, ImageIcon}
 import javax.swing.border._
-import java.awt.{Font,Desktop}
+import java.awt.{Font, Desktop, Toolkit}
 import scala.util.Try
 import java.io.File
 import java.net.URI
-
 
 object app {
   def main(args: Array[String]) {
@@ -32,9 +31,9 @@ class UI extends MainFrame {
 	val chkOrganizar = new CheckBox("Organizar")
   // val chkSecuenciar = new CheckBox("Secuenciar")
   //val chkCodificar = new CheckBox("Codificar solo en Ansi")
-	val txtAreaOutput = new TextArea(10,55){
+	val txtAreaOutput = new TextArea(15,54){
 		editable = false
-		font = new Font("Console",Font.PLAIN,10)
+		font = new Font("Console",Font.PLAIN,11)
 	}
 	val scrollTxtArea = new ScrollPane(txtAreaOutput){
 		verticalScrollBarPolicy = ScrollPane.BarPolicy.AsNeeded
@@ -51,17 +50,18 @@ class UI extends MainFrame {
       case _ => new Core(ui).start
     }
     case ButtonClicked(`btnConfig`) => Try(Desktop.getDesktop().edit(new File("application.conf"))).getOrElse(
-      throw ErrorGuiApp("ErrorGuiApp: No se puede abrir el archivo")
+      txtAreaOutput.append("ErrorGuiApp: No se puede abrir el archivo\n")
     )
     case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI("https://github.com/EricQuinterX/procesador-de-pasajes"))).getOrElse(
-      throw ErrorGuiApp("ErrorGuiApp: No se puede abrir el vinculo al Repositorio")
+      txtAreaOutput.append("ErrorGuiApp: No se puede abrir el vinculo al Repositorio\n")
     )
   }
 
 	// Propiedades
-  title = s"Procesador de Pasajes Engage v$version"
+  title = s"Ordenador de Pasajes Engage v$version"
   resizable = false
   peer.setLocationRelativeTo(null)
+  iconImage = new ImageIcon(getClass.getResource("/icon_app.png")).getImage
 
   //Contenidos
   contents = new BoxPanel(Orientation.Vertical) {
@@ -70,10 +70,9 @@ class UI extends MainFrame {
 			contents += HStrut(4)
 			contents += txtInputPath
 		}
-		contents += new FlowPanel(FlowPanel.Alignment.Left)(){
-      contents += HStrut(10)
+		contents += new FlowPanel(FlowPanel.Alignment.Right)(){
       contents += btnProcesar
-      contents += HStrut(100)
+      contents += HStrut(5)
       contents += btnConfig
       contents += HStrut(5)
       contents += btnHelp
