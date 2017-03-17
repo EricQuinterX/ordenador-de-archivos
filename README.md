@@ -1,4 +1,2 @@
 # procesador-de-pasajes
-Su utilidad seria clasificar, ordenar, renombrar archivos y codificar en ansi los scripts.
-
-# en construccion ...
+Su utilidad seria clasificar, ordenar y renombrar archivos.
