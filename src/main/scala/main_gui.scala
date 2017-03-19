@@ -7,30 +7,31 @@ import scala.swing.event._
 import Swing.{HStrut, VStrut, EmptyBorder}
 import javax.swing.{BorderFactory, ImageIcon}
 import javax.swing.border._
-import java.awt.{Font, Desktop, Toolkit}
+import java.awt.{Font, Desktop}
 import scala.util.Try
 import java.io.File
 import java.net.URI
+// import java.lang.Runtime
+
 
 object app {
   def main(args: Array[String]) {
     val ui = new UI
     ui.pack()
+    ui.peer.setLocationRelativeTo(null)
     ui.visible = true
   }
 }
+
 
 class UI extends MainFrame {
 
 	val version = "1.0"
 	val ui = this
+
 	// Componentes
 	val lbPath = new Label("Ruta:")
-  //val lbNote = new Label("* : salida en ansi")
 	val txtInputPath = new TextField(45)
-	val chkOrganizar = new CheckBox("Organizar")
-  // val chkSecuenciar = new CheckBox("Secuenciar")
-  //val chkCodificar = new CheckBox("Codificar solo en Ansi")
 	val txtAreaOutput = new TextArea(15,54){
 		editable = false
 		font = new Font("Console",Font.PLAIN,11)
@@ -40,27 +41,31 @@ class UI extends MainFrame {
 		border = BorderFactory.createTitledBorder("Detalles")
 	}
 	val btnProcesar = new Button("Organizar")
-	val btnConfig = new Button("Config")
-  val btnHelp = new Button("Ayuda")
+	val btnConfig   = new Button("Config")
+  val btnHelp     = new Button("Ayuda")
 
+  // Eventos
   listenTo(btnProcesar, btnConfig, btnHelp)
   reactions += {
+
     case ButtonClicked(`btnProcesar`) => txtInputPath.text match {
-      case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="You pressed me")
+      case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="Advertencia")
       case _ => new Core(ui).start
     }
-    case ButtonClicked(`btnConfig`) => Try(Desktop.getDesktop().edit(new File("application.conf"))).getOrElse(
-      txtAreaOutput.append("ErrorGuiApp: No se puede abrir el archivo\n")
-    )
+
+    case ButtonClicked(`btnConfig`) =>
+      val path = new File("application.config").getPath
+      Try(Runtime.getRuntime.exec("cmd.exe /C start " + path)).getOrElse(
+        txtAreaOutput.append("ErrorCargarConfiguracion: No se puede abrir el archivo."))
+
     case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI("https://github.com/EricQuinterX/procesador-de-pasajes"))).getOrElse(
       txtAreaOutput.append("ErrorGuiApp: No se puede abrir el vinculo al Repositorio\n")
     )
   }
 
 	// Propiedades
-  title = s"Ordenador de Pasajes Engage v$version"
+  title = s"Ordenador de Archivos v$version"
   resizable = false
-  peer.setLocationRelativeTo(null)
   iconImage = new ImageIcon(getClass.getResource("/icon_app.png")).getImage
 
   //Contenidos

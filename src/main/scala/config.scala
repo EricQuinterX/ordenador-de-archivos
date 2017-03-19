@@ -1,7 +1,6 @@
 package config_app
 
-import core_app._
-import modulo_app._
+import errores_app._
 
 import com.typesafe.config.{ConfigFactory, Config}
 import scala.util.{Try, Success, Failure}
@@ -9,9 +8,9 @@ import java.io.File
 
 object ConfigFile {
 
-	def configFile = Try(ConfigFactory.parseFile(new File("application.conf")).getConfig("app")) match {
+	def configFile = Try(ConfigFactory.parseFile(new File("application.config")).getConfig("app")) match {
 		case Success(s) => s
-		case Failure(e) => throw new ErrorCargarConfiguracion("Error al parsear la configuracion\n" + e.getMessage)
+		case Failure(e) => throw ErrorCargarConfiguracion("No se pudo parsear el archivo de configuracion")
 	}
 
 	def config = Try(ConfigFactory.load(configFile)) match {
@@ -19,28 +18,42 @@ object ConfigFile {
 		case Failure(e) => throw new ErrorCargarConfiguracion("Error al cargar el parseo de la configuracion\n" + e.getMessage)
 	}
 
-	def getFolder(m : Sistema) : String = {
-		val destino = m match {
-			case Organizacion => Try(config.getString("destino_organizador"))
-			case Secuenciacion => Try(config.getString("destino_secuenciador"))
-			case Codificacion => Try(config.getString("destino_codificador"))
-		}
-		destino match {
-			case Success(s) => s
-			case Failure(e) => {
-				val msg = s"No se recupero el nombre de la carpeta de ${m.getClass.getName} en la configuracion\n" + e.getMessage
-				throw new ErrorObtenerDatoConfig(msg)}
+	def getFolder(m : Sistema = Organizacion) : String = Try(config.getString("destination_folder")) match {
+		case Success(s) => s
+		case Failure(e) => {
+			val msg = s"No se recupero el nombre de la carpeta de ${m.getClass.getName} en la configuracion\n" + e.getMessage
+			throw ErrorObtenerDatoConfig(msg)
 		}
 	}
 
-	def getPriorityList : List[FileKeyword] = {
+	def getFilters : List[FileKeyword] = {
 		import scala.collection.JavaConversions._
-		Try(config.getConfigList("priority").map(FileKeyword(_)).toList) match {
-			case Failure(e) => throw new ErrorObtenerDatoConfig("Error al recuperar la lista de filtros de la configuracion\n" + e.getMessage)
+		Try(config.getConfigList("filters").map(FileKeyword(_)).toList) match {
 			case Success(s) => s
+			case Failure(e) => throw new ErrorObtenerDatoConfig("Error al recuperar la lista de filtros de la configuracion\n" + e.getMessage)
 		}
 	}
+
+	def getFileType : String = Try(config.getString("file_type")) match {
+		case Success(s) => if (s.isEmpty.unary_!) s else throw ErrorObtenerDatoConfig("ErrorObtenerDatoConfig: es un dato vacio.")
+		case Failure(e) => throw ErrorObtenerDatoConfig("No se pudo recuperar tal valor.")
+	}
+
+	def getTool : String = Try(config.getString("tool")) match {
+		case Success(s) => if (s.isEmpty.unary_!) s else throw ErrorObtenerDatoVacio("Es un dato vacio.")
+		case Failure(e) => throw ErrorObtenerDatoConfig("No se pudo recuperar tal valor.")
+	}
+
+	def getFolderList : List[Folder] = {
+		import scala.collection.JavaConversions._
+		Try(config.getConfigList("folders").map(Folder(_)).toList) match {
+			case Success(s) => s
+			case Failure(e) => throw new ErrorObtenerDatoConfig("Error al recuperar la lista de carpetas de la configuracion\n" + e.getMessage)
+		}
+	}
+
 }
+
 
 trait Sistema
 case object Organizacion extends Sistema
@@ -48,7 +61,12 @@ case object Secuenciacion extends Sistema
 case object Codificacion extends Sistema
 
 case class FileKeyword (params: Config) {
-	val keyword: String = Try (params.getString("keyword")).getOrElse(".")
-	val folder : String = Try (params.getString("folder")).getOrElse("NEW")
-	val match_pos : String = Try (params.getString("pos")).getOrElse("MEDIO")
+	val keyword: String = params.getString("keyword")
+	val folder : String = params.getString("folder")
+	val match_pos : String = params.getString("pos")
+}
+
+case class Folder (params: Config) {
+	val name : String = params.getString("name")
+	val show : Boolean = params.getString("show").toBoolean
 }
