@@ -58,7 +58,7 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
     for (i <- 0 to tamFiltros) {
       if (i == tamFiltros)
         // llego al ultimo, ejecuto los restantes
-        filtrar(".", "", ".*")
+        filtrar(".", "", "INICIO")
       else
         // Paso los valores de cada filtro de la lista, para que el metodo filtro filtre con esos valores
         filtrar(filtros(i).keyword, filtros(i).folder, filtros(i).match_pos)
@@ -78,6 +78,8 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
 	private def filtrar (word: String, folder: String, pos: String): Unit = {
     // Funcion que veriica la posicion, el patron y el nombre de la carpeta origen con el destino
     def criteria(x: File) : Boolean = {
+      // En caso que haya recorrido todos los filtros, los demas los dejo cumplir la condicion.
+      if (folder.isEmpty) return true
       // Cada vez que encuentre un *** dentro del keyword, lo reemplazo con .*
       val regex = word.replaceAllLiterally("***", ".*") + ".*"
       val patron = Pattern.compile(regex)
@@ -91,7 +93,7 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
     var filtrados: List[File] = Nil
     for (f <- restantes.filter(criteria).sortBy(_.getName)){
       // Inserto en la lista el nuevo nombre del archivo
-      ordenados = (f, getNewName(index, folder, f.getName)) ::  ordenados
+      ordenados = (f, getNewName(index, f.getParentFile.getName, f.getName)) ::  ordenados
       index += 1
       filtrados = f :: filtrados
     }
@@ -105,7 +107,7 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
       case Success(s) => if (!s) throw new ErrorCrearCarpeta("No se limpio la carpeta destino")
       case Failure(e) => out.append(e.getMessage)
     }
-    out.append(s"Directorio ${dir.getName} creado\n")
+    out.append(s"Directorio ${dir.getName} creado.\n")
     out.append(s"Archivos creados:\n")
     // CREO LOS ARCHIVOS CON SUS RESPECTIVOS NOMBRES
     for ((src, name) <- ordenados.sortBy(_._2)){
