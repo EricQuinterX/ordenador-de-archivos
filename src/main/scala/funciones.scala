@@ -76,8 +76,9 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
 
 
 	private def filtrar (word: String, folder: String, pos: String): Unit = {
-    // Funcion que compara el nombre de la carpeta "NEW/OLD", el patron "keyword" y la posicion "INICIO/MEDIO"
+    // Funcion que veriica la posicion, el patron y el nombre de la carpeta origen con el destino
     def criteria(x: File) : Boolean = {
+      // Cada vez que encuentre un *** dentro del keyword, lo reemplazo con .*
       val regex = word.replaceAllLiterally("***", ".*") + ".*"
       val patron = Pattern.compile(regex)
       val matcher = patron.matcher(x.getName)
@@ -106,17 +107,18 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
     }
     out.append(s"Directorio ${dir.getName} creado\n")
     out.append(s"Archivos creados:\n")
-    // CREO LOS ARCHIVOS SQL CON SUS RESPECTIVOS NOMBRES
+    // CREO LOS ARCHIVOS CON SUS RESPECTIVOS NOMBRES
     for ((src, name) <- ordenados.sortBy(_._2)){
       val destin = new File(dir.getPath + "\\" + name)
       val fos = new FileOutputStream(destin)
       fos.getChannel.transferFrom(new FileInputStream(src).getChannel, 0, Long.MaxValue)
       fos.close // IMPORTANTE CERRAR EL ARCHIVO
-      out.append("  " + name + "\n")
+      out.append("   " + name + "\n")
     }
   }
 
 	private def getNewName (i: Int, prefix: String, filename: String) = {
+    // Verifico si debo mostrar el nombre de carpeta de origen de archivo, contenido en su nombre.
     if (folders.filter(_.name == prefix).map(_.show).head)
       getIndex(i,total) + "_" + prefix + "_" + filename
     else

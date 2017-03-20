@@ -15,7 +15,7 @@ object ConfigFile {
 
 	def config = Try(ConfigFactory.load(configFile)) match {
 		case Success(s) => s
-		case Failure(e) => throw new ErrorCargarConfiguracion("Error al cargar el parseo de la configuracion\n" + e.getMessage)
+		case Failure(e) => throw ErrorCargarConfiguracion("Error al cargar el parseo de la configuracion\n" + e.getMessage)
 	}
 
 	def getFolder(m : Sistema = Organizacion) : String = Try(config.getString("destination_folder")) match {
@@ -30,7 +30,7 @@ object ConfigFile {
 		import scala.collection.JavaConversions._
 		Try(config.getConfigList("filters").map(FileKeyword(_)).toList) match {
 			case Success(s) => s
-			case Failure(e) => throw new ErrorObtenerDatoConfig("Error al recuperar la lista de filtros de la configuracion\n" + e.getMessage)
+			case Failure(e) => throw ErrorObtenerDatoConfig("Error al recuperar la lista de filtros de la configuracion\n" + e.getMessage)
 		}
 	}
 
@@ -48,7 +48,7 @@ object ConfigFile {
 		import scala.collection.JavaConversions._
 		Try(config.getConfigList("folders").map(Folder(_)).toList) match {
 			case Success(s) => s
-			case Failure(e) => throw new ErrorObtenerDatoConfig("Error al recuperar la lista de carpetas de la configuracion\n" + e.getMessage)
+			case Failure(e) => throw ErrorObtenerDatoConfig("Error al recuperar la lista de carpetas de la configuracion\n" + e.getMessage)
 		}
 	}
 

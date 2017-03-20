@@ -20,6 +20,7 @@ class Core (gui: UI) {
 				case ErrorCrearCarpeta(msg) 			 => setGuiLog("ErrorCrearCarpeta: " + msg)
 				case ErrorCrearArchivo(msg) 			 => setGuiLog("ErrorGetFolderName: " + msg)
 				case ErrorCopiarArchivos(msg) 		 => setGuiLog("ErrorCopiarArchivos: " + msg)
+				case ErrorObtenerDatoVacio(msg)    => setGuiLog("ErrorObtenerDatoVacio: " + msg)
 				case ErrorObtenerDatoConfig(msg)	 => setGuiLog("ErrorObtenerDatoConfig: " + msg)
 				case ErrorCargarConfiguracion(msg) => setGuiLog("ErrorCargarConfiguracion: " + msg)
 		} finally {
