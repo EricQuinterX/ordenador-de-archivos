@@ -58,7 +58,7 @@ class UI extends MainFrame {
       Try(Runtime.getRuntime.exec("cmd.exe /C start " + path)).getOrElse(
         txtAreaOutput.append("ErrorCargarConfiguracion: No se puede abrir el archivo."))
 
-    case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI("https://github.com/EricQuinterX/procesador-de-pasajes"))).getOrElse(
+    case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI("https://github.com/EricQuinterX/ordenador-de-archivos"))).getOrElse(
       txtAreaOutput.append("ErrorGuiApp: No se puede abrir el vinculo al Repositorio\n")
     )
   }
