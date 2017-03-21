@@ -67,7 +67,11 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
     createFiles(new File(ruta + "\\" + carpeta_destino))
     out.append(s"($index/$total) archivos fueron organizados\n")
     // Verifico si se organizaron todos los archivos de las carpetas
-    val finalMsg = if (total == index) "La operacion se completo satisfactoriamente" else "No se organizaron todos los archivos"
+    val finalMsg = total match {
+      case 0 => "No habia archivos para ordenar"
+      case n if (n == `index`) => "La operacion se completo satisfactoriamente"
+      case _ => "No se ordenaron todos los archivos"
+    }
     out.append(s"$finalMsg\n")
   }
 
@@ -113,8 +117,10 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
     for ((src, name) <- ordenados.sortBy(_._2)){
       val destin = new File(dir.getPath + "\\" + name)
       val fos = new FileOutputStream(destin)
-      fos.getChannel.transferFrom(new FileInputStream(src).getChannel, 0, Long.MaxValue)
+      val fin = new FileInputStream(src)
+      fos.getChannel.transferFrom( fin.getChannel, 0, Long.MaxValue)
       fos.close // IMPORTANTE CERRAR EL ARCHIVO
+      fin.close // IMPORTANTE CERRAR EL ARCHIVO
       out.append("   " + name + "\n")
     }
   }
