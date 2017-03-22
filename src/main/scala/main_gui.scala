@@ -1,6 +1,7 @@
 package main_app
 
 import core_app._
+import config_app._
 
 import scala.swing._
 import scala.swing.event._
@@ -11,7 +12,6 @@ import java.awt.{Font, Desktop}
 import scala.util.Try
 import java.io.File
 import java.net.URI
-// import java.lang.Runtime
 
 
 object app {
@@ -58,7 +58,7 @@ class UI extends MainFrame {
       Try(Runtime.getRuntime.exec("cmd.exe /C start " + path)).getOrElse(
         txtAreaOutput.append("ErrorCargarConfiguracion: No se puede abrir el archivo."))
 
-    case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI("https://github.com/EricQuinterX/ordenador-de-archivos"))).getOrElse(
+    case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI(ConfigFile.getLinkHelp))).getOrElse(
       txtAreaOutput.append("ErrorGuiApp: No se puede abrir el vinculo al Repositorio\n")
     )
   }

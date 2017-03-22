@@ -52,6 +52,11 @@ object ConfigFile {
 		}
 	}
 
+	def getLinkHelp : String = Try(config.getString("link_help")) match {
+		case Success(s) => if (s.isEmpty.unary_!) s else throw ErrorObtenerDatoConfig("ErrorObtenerDatoConfig: es un dato vacio.")
+		case Failure(e) => throw ErrorObtenerDatoConfig("No se pudo recuperar tal valor.")
+	}
+
 }
 
 
