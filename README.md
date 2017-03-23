@@ -1,5 +1,7 @@
 # Ordenador de Archivos
-Archivos de diferentes carpetas adyacentes son volcados a una carpeta con un order establecido (basada en una lista de prioridades) y enumerados.
+Archivos de diferentes carpetas adyacentes son volcados a una carpeta con un order establecido (basada en una lista de criterios) y finalmente enumerados. <br/>
+El motivo de su desarrollo surgio por el tiempo extra que se necesitaba para ordenarlos y renombrarlos a cada uno. 
+
 ## Requisitos
 * Windows 7+
 * Java version 1.8 (obligatorio para el ejecutable)
@@ -8,23 +10,19 @@ Archivos de diferentes carpetas adyacentes son volcados a una carpeta con un ord
 ## Generar Ejecutable
 1. Abrir la consola de windows dentro del proyecto clonado y ejecutar:
 ```
-> sbt build-launcher
+> sbt assembly
 ```
-2. Entrar en `/target/sbt-launch4j`, copiar la carpeta `app` y pegarlo en otro lado.
-3. Copiar el `application.config` del root del proyecto, podes modificarlo en base a tus requerimientos.
-4. Copiar el `/jre` del jdk instalado.
-5. Pegar estos 2 ultimos archivos en la carpeta `/app`. Al final quedaria asi:
-```
-/app
-  |- /lib
-  |- /jre
-  |- application.config
-  |- ordenador-de-archivos.exe
-```
+2. Recuperar el `.jar` generado
+3. Seguir el paso a paso de [Generar .exe](http://trabajosdesisifo.blogspot.com.ar/2015/12/java-bundle-jre-inside-executable-file.html) apartir del **Step 2**
+
 ## Utilizacion
+0. Instalar el aplicativo
 1. Ejecutar el aplicativo `.exe`
-2. Especificar la ruta donde se encuentran las carpetas adyacentes con los archivos a ordenar. 
+2. Especificar la ruta donde se encuentran las carpetas adyacentes con los archivos para ordenar
 3. Click en **Config** para establecer:
-	* El nombre de la carpeta ...
-4.
-5.
+	* El nombre de la carpeta destino
+	* Modificar la lista de filtros de prioridades
+	* Establecer el tipo de archivo a filtrar
+	* Establecer las carpetas adyacentes involucradas
+4. Click en **Ordenar**
+5. Ver la carpeta nueva resultante con los archivos ordenados y enumerados
