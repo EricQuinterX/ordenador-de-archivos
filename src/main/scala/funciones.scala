@@ -24,13 +24,13 @@ trait Modulo {
     else List[File]()
   }
 
-  def clearAndCreateDir(destino: File) : Boolean = {
+  def deleteFolder(destino: File) : Boolean = {
     def deleteAll (file: File) : Boolean = {
       if (file.isDirectory)
         file.listFiles.foreach(deleteAll)
       !(file.exists && !file.delete)
     }
-    deleteAll(destino) && destino.mkdir
+    deleteAll(destino)
   }
 }
 
@@ -63,16 +63,25 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
         // Paso los valores de cada filtro de la lista, para que el metodo filtro filtre con esos valores
         filtrar(filtros(i).keyword, filtros(i).folder, filtros(i).match_pos)
     }
-    // Copio los archivos de las 2 carpetas a un nueva en base a los nuevos nombres de la lista nueva
-    createFiles(new File(ruta + "\\" + carpeta_destino))
-    out.append(s"($index/$total) archivos fueron organizados\n")
-    // Verifico si se organizaron todos los archivos de las carpetas
-    val finalMsg = total match {
-      case 0 => "No habia archivos para ordenar"
-      case n if (n == `index`) => "La operacion se completo satisfactoriamente"
-      case _ => "No se ordenaron todos los archivos"
+
+    val dest_folder = new File(ruta + "\\" + carpeta_destino)
+
+    Try(deleteFolder(dest_folder)) match {
+      case Success(s) if (!s) => throw ErrorCrearCarpeta("No se pudo limpiar la carpeta destino")
+      case Failure(e) => out.append(e.getMessage)
+      case Success(_) =>
+        val p = createFiles(dest_folder)
+        if (p > 0) {
+          out.append(s"($p/$total) archivos fueron organizados\n")
+          if (p == total)
+            out.append("La operacion se completo satisfactoriamente\n")
+          else {
+            out.append(s"Faltan ordenar ${total - p} archivos")
+            throw ErrorTerminarProceso("No se procesaron todos los archivos")
+          }
+        }
+
     }
-    out.append(s"$finalMsg\n")
   }
 
 
@@ -105,24 +114,28 @@ class Ordenador (ruta : String, out : TextArea) extends Modulo {
     restantes = restantes filterNot filtrados.contains
 	}
 
+  private def createFiles(dir: File) : Int = {
+    var procesados = 0
+    if (dir.mkdir)
+      out.append(s"Directorio ${dir.getName} creado.\n")
+    else
+      throw ErrorCrearCarpeta("No se limpio la carpeta destino")
 
-  private def createFiles(dir: File) = {
-    Try(clearAndCreateDir(dir)) match {
-      case Success(s) => if (!s) throw new ErrorCrearCarpeta("No se limpio la carpeta destino")
-      case Failure(e) => out.append(e.getMessage)
-    }
-    out.append(s"Directorio ${dir.getName} creado.\n")
     out.append(s"Archivos creados:\n")
     // CREO LOS ARCHIVOS CON SUS RESPECTIVOS NOMBRES
     for ((src, name) <- ordenados.sortBy(_._2)){
       val destin = new File(dir.getPath + "\\" + name)
       val fos = new FileOutputStream(destin)
       val fin = new FileInputStream(src)
-      fos.getChannel.transferFrom( fin.getChannel, 0, Long.MaxValue)
+      Try(fos.getChannel.transferFrom( fin.getChannel, 0, Long.MaxValue)) match {
+        case Success(_) => procesados += 1
+        case Failure(_) => procesados += 0
+      }
       fos.close // IMPORTANTE CERRAR EL ARCHIVO
       fin.close // IMPORTANTE CERRAR EL ARCHIVO
       out.append("   " + name + "\n")
     }
+    procesados
   }
 
 	private def getNewName (i: Int, prefix: String, filename: String) = {
