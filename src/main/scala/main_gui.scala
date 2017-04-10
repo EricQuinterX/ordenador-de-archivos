@@ -30,10 +30,10 @@ class UI extends MainFrame {
 	val ui = this
 
 	// Componentes
-	val lbPath = new Label("Ruta:")
+	val lbPath       = new Label("Ruta:")
 	val txtInputPath = new TextField(45)
-  val lbDestino = new Label("Destino:")
-  val txtDestino = new TextField(20){
+  val lbDestino    = new Label("Destino:")
+  val txtDestino   = new TextField(20){
     font = new Font("Console",Font.PLAIN,12)
     foreground = Color.gray
     text = ConfigFile.getFolder()
@@ -68,7 +68,7 @@ class UI extends MainFrame {
   }
 
 	// Propiedades
-  title = s"Ordenador de Archivos v$version"
+  title     = s"Ordenador de Archivos v$version"
   resizable = false
   iconImage = new ImageIcon(getClass.getResource("/icon_app.png")).getImage
 
