@@ -15,7 +15,7 @@ class Core (gui: UI) {
 	def start = {
 		try {
 			blockComponents
-			new Ordenador(gui.txtInputPath.text, gui.txtAreaOutput).startFunction
+			new Ordenador(gui.txtInputPath.text, gui.txtAreaOutput, Some(gui.txtDestino.text)).startFunction
 		} catch {
 				case ErrorCrearCarpeta(msg) 			 => setGuiLog("ErrorCrearCarpeta: " + msg)
 				case ErrorCrearArchivo(msg) 			 => setGuiLog("ErrorGetFolderName: " + msg)

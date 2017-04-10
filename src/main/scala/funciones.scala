@@ -36,14 +36,14 @@ trait Modulo {
 
 
 
-class Ordenador (ruta : String, out : TextArea) extends Modulo {
+class Ordenador (ruta : String, out : TextArea, dest : Option[String] = None) extends Modulo {
 
   var index: Int = 0
   var restantes : List[File] = Nil
   var ordenados : List[(File, String)] = Nil
   var total : Int = 0
   val folders : List[Folder] = ConfigFile.getFolderList
-  val carpeta_destino : String = ConfigFile.getFolder()
+  val carpeta_destino : String = dest.getOrElse(ConfigFile.getFolder())
 
   def startFunction = {
     // Cada vez que ejecuta esta funcionalidad, recupero la lista de filtros si es que lo modifico en tiempo de ejecucion

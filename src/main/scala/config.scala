@@ -18,7 +18,7 @@ object ConfigFile {
 		case Failure(e) => throw ErrorCargarConfiguracion("Error al cargar el parseo de la configuracion\n" + e.getMessage)
 	}
 
-	def getFolder(m : Sistema = Organizacion) : String = Try(config.getString("destination_folder")) match {
+	def getFolder(m : Sistema = Organizacion) : String = Try(config.getString("output_folder")) match {
 		case Success(s) => s
 		case Failure(e) => {
 			val msg = s"No se recupero el nombre de la carpeta de ${m.getClass.getName} en la configuracion\n" + e.getMessage
