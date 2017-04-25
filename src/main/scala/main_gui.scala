@@ -5,11 +5,12 @@ import config_app._
 
 import scala.swing._
 import scala.swing.event._
+import scala.util.Try
 import Swing.{HStrut, VStrut, EmptyBorder}
 import javax.swing.{BorderFactory, ImageIcon}
 import javax.swing.border._
 import java.awt.{Font, Desktop, Color}
-import scala.util.Try
+import java.util.regex.{Matcher, Pattern}
 import java.io.File
 import java.net.URI
 
@@ -53,10 +54,15 @@ class UI extends MainFrame {
   // Eventos
   listenTo(btnProcesar, btnConfig, btnHelp, txtDestino)
   reactions += {
-    case ButtonClicked(`btnProcesar`) => txtInputPath.text match {
-      case "" => Dialog.showMessage(null,	"Ingrese la ruta por favor.", title="Advertencia")
-      case _ => new Core(ui).start
-    }
+    case ButtonClicked(`btnProcesar`) =>
+      if (txtInputPath.text.isEmpty)
+        Dialog.showMessage(null, "Ingrese la ruta por favor.", title="Advertencia")
+      else{
+        if (new File(txtInputPath.text).isDirectory)
+          new Core(ui).start
+        else
+          Dialog.showMessage(null, "Ruta incorrecta.", title="Advertencia")
+      }
     case ButtonClicked(`btnConfig`) =>
       val path = new File("application.config").getPath
       Try(Runtime.getRuntime.exec("cmd.exe /C start " + path)).getOrElse(
@@ -64,11 +70,13 @@ class UI extends MainFrame {
     case ButtonClicked(`btnHelp`) => Try(Desktop.getDesktop().browse(new URI(ConfigFile.getLinkHelp))).getOrElse(
       txtAreaOutput.append("ErrorGuiApp: No se puede abrir el vinculo al Repositorio\n")
     )
-    case EditDone(`txtDestino`) => if (txtDestino.text.isEmpty) txtDestino.text = ConfigFile.getFolder()
+    case EditDone(`txtDestino`) =>
+      val machea = Pattern.compile("""^[A-Za-z0-9_ \-]+$""").matcher(txtDestino.text).find
+      if (!machea) txtDestino.text = ConfigFile.getFolder()
   }
 
 	// Propiedades
-  title     = s"Ordenador de Archivos v$version"
+  title     = s"Organizador de Archivos v$version"
   resizable = false
   iconImage = new ImageIcon(getClass.getResource("/icon_app.png")).getImage
 

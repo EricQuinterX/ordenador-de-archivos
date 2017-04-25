@@ -13,7 +13,7 @@ class Configuracion extends FunSuite {
 
   test("Devuelve el tamanio de la lista de filtros") {
 
-    assert(ConfigFile.getFilters.size == 21)
+    assert(ConfigFile.getFilters.size == 20)
 
   }
 

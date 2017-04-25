@@ -1,10 +1,10 @@
-name := "ordenador-de-archivos"
+name := "organizador-de-archivos"
 
 version := "1.0"
 
 scalaVersion := "2.12.1"
 
-assemblyJarName := s"Ordenador de Archivos v${version.value}.jar"
+assemblyJarName := s"Organizador de Archivos v${version.value}.jar"
 
 libraryDependencies ++= Seq(
 	"org.scala-lang.modules" %% "scala-swing" % "2.0.0-M2",
