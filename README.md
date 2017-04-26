@@ -4,7 +4,7 @@ El motivo de su desarrollo surgio por el tiempo extra que se necesitaba para ord
 
 ## Requisitos
 * Windows 7+
-* Java version 1.8 (obligatorio para el ejecutable)
+* Java version 1.6+
 * SBT 0.13.13
 
 ## Generar Ejecutable
@@ -12,17 +12,16 @@ El motivo de su desarrollo surgio por el tiempo extra que se necesitaba para ord
 ```
 > sbt assembly
 ```
-2. Recuperar el `.jar` generado
-3. Seguir el paso a paso de [Generar .exe](http://trabajosdesisifo.blogspot.com.ar/2015/12/java-bundle-jre-inside-executable-file.html) apartir del **Step 2**
+2. Seguir el paso a paso de [Generar .exe](http://trabajosdesisifo.blogspot.com.ar/2015/12/java-bundle-jre-inside-executable-file.html) apartir del **Step 2**
 
 ## Utilizacion
-0. Instalar el aplicativo
-1. Ejecutar el aplicativo `.exe`
-2. Especificar la ruta donde se encuentran las carpetas adyacentes con los archivos para ordenar
-3. Click en **Config** para establecer:
-	* El nombre de la carpeta destino
+1. Instalar el aplicativo
+2. Ejecutar el aplicativo `Ordenador.exe`
+3. Indicar la ruta donde se encuentren las carpetas adyacentes con los archivos para ordenar
+4. Indicar el nombre de la carpeta en donde se va a generar los arhivos ordenados (por default, esta en el `application.config`)
+5. Click en **Config** para establecer:
 	* Modificar la lista de filtros de prioridades
-	* Establecer el tipo de archivo a filtrar
+	* Establecer el tipo de archivo a filtrar, puede ser sql txt cpp etc....
 	* Establecer las carpetas adyacentes involucradas
-4. Click en **Ordenar**
-5. Ver la carpeta nueva resultante con los archivos ordenados y enumerados
+6. Click en **Ordenar**
+7. Ver la carpeta nueva resultante con los archivos ordenados y enumerados
